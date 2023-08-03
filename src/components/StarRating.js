@@ -1,6 +1,19 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  defaultRating: PropTypes.number,
+  color: PropTypes.string,
+  strokeColor: PropTypes.string,
+  size: PropTypes.number,
+  textSize: PropTypes.number,
+  textColor: PropTypes.string,
+  className: PropTypes.string,
+  messages: PropTypes.array,
+  onSetRating: PropTypes.func,
+};
+
 const containerStyle = {
   display: "flex",
   alignItems: "center",
@@ -11,38 +24,39 @@ const starContainerStyle = {
   display: "flex",
 };
 
-StarRating.propTypes = {
-  maxRating: PropTypes.number,
-  defaultRaing: PropTypes.number,
-  color: PropTypes.string,
-  size: PropTypes.number,
-  messages: PropTypes.array,
-  className: PropTypes.string,
-  onSetRating: PropTypes.func,
-};
-
 export default function StarRating({
-  maxRating = 5,
+  maxRating,
+  defaultRating = 0,
   color = "#fcc419",
+  strokeColor = "#fcc419",
   size = 48,
+  textSize = 24,
+  textColor = "#000",
   className = "",
   messages = [],
-  defaultRaing = 0,
   onSetRating,
 }) {
-  const [rating, setRating] = useState(defaultRaing);
-  const [tempRating, setTempRating] = useState(defaultRaing);
+  const [rating, setRating] = useState(defaultRating);
+  const [tempRating, setTempRating] = useState(defaultRating);
 
-  function handleRating(rating) {
-    setRating(rating);
-    onSetRating(rating);
+  function handleRated(num) {
+    setRating(num);
+    onSetRating(num);
+  }
+
+  function handleHoverIn(num) {
+    setTempRating(num);
+  }
+
+  function handleHoverOut() {
+    setTempRating(0);
   }
 
   const textStyle = {
-    fontSize: `${size / 1.5}px`,
+    fontSize: `${textSize}px`,
     lineHeight: "1",
     margin: "0",
-    color,
+    color: textColor,
   };
 
   return (
@@ -51,11 +65,12 @@ export default function StarRating({
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             key={i}
+            onRated={() => handleRated(i + 1)}
             full={tempRating ? tempRating >= i + 1 : rating >= i + 1}
-            onRate={() => handleRating(i + 1)}
-            onHoverIn={() => setTempRating(i + 1)}
-            onHoverOut={() => setTempRating(0)}
+            onHoverIn={() => handleHoverIn(i + 1)}
+            onHoverOut={handleHoverOut}
             color={color}
+            strokeColor={strokeColor}
             size={size}
           />
         ))}
@@ -69,8 +84,16 @@ export default function StarRating({
   );
 }
 
-function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
-  const startStyle = {
+function Star({
+  full,
+  onRated,
+  onHoverIn,
+  onHoverOut,
+  color,
+  strokeColor,
+  size,
+}) {
+  const starStyle = {
     width: `${size}px`,
     height: `${size}px`,
     display: "block",
@@ -80,8 +103,8 @@ function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
   return (
     <span
       role="button"
-      style={startStyle}
-      onClick={onRate}
+      style={starStyle}
+      onClick={onRated}
       onMouseEnter={onHoverIn}
       onMouseLeave={onHoverOut}
     >
@@ -90,7 +113,7 @@ function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill={color}
-          stroke={color}
+          stroke={strokeColor}
         >
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
@@ -99,7 +122,7 @@ function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke={color}
+          stroke={strokeColor}
         >
           <path
             strokeLinecap="round"
@@ -112,36 +135,3 @@ function Star({ full, onRate, onHoverIn, onHoverOut, color, size }) {
     </span>
   );
 }
-
-/*
-FULL STAR
-
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 20 20"
-  fill="#000"
-  stroke="#000"
->
-  <path
-    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-  />
-</svg>
-
-
-EMPTY STAR
-
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="#000"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="{2}"
-    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-  />
-</svg>
-
-*/
